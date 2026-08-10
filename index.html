@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>애매선물연구소 — 그 관계, 그 선물</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="phone">
+
+  <div class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="9" width="18" height="12" rx="2" fill="#FF6B4D"/>
+        <rect x="3" y="9" width="18" height="4" fill="#FFC857"/>
+        <rect x="10.5" y="9" width="3" height="12" fill="#1B2540"/>
+        <path d="M12 9C12 9 8 9 8 6C8 4.5 9.5 4 10.5 5C11.3 5.8 12 9 12 9Z" fill="#FFC857"/>
+        <path d="M12 9C12 9 16 9 16 6C16 4.5 14.5 4 13.5 5C12.7 5.8 12 9 12 9Z" fill="#FF6B4D"/>
+      </svg>
+      <span class="brand-name display">애매선물<b>연구소</b></span>
+    </div>
+    <div class="dots" id="dots">
+      <span class="dot" data-d="1"></span>
+      <span class="dot" data-d="2"></span>
+      <span class="dot" data-d="3"></span>
+      <span class="dot" data-d="4"></span>
+      <span class="dot" data-d="5"></span>
+    </div>
+  </div>
+
+  <div class="screen">
+
+    <!-- STEP 0 : INTRO -->
+    <section class="step active" data-step="0">
+      <div class="intro-wrap">
+        <svg class="giftbox" viewBox="0 0 120 120" fill="none">
+          <rect x="14" y="46" width="92" height="62" rx="8" fill="#FF6B4D"/>
+          <rect x="14" y="46" width="92" height="18" fill="#FFC857"/>
+          <rect x="52" y="46" width="16" height="62" fill="#1B2540"/>
+          <path d="M60 46C60 46 42 46 42 30C42 22 50 18 55 24C59 29 60 46 60 46Z" fill="#FFC857"/>
+          <path d="M60 46C60 46 78 46 78 30C78 22 70 18 65 24C61 29 60 46 60 46Z" fill="#FF6B4D"/>
+        </svg>
+        <h1 class="hl">그 사람 선물,<br>또 카페 기프티콘?</h1>
+        <p class="sub">썸, 어려운 상사, 오랜만에 연락된 친구… 애매한 관계일수록 선물은 더 고민되죠. 관계와 상황만 알려주면 딱 맞는 선물과 카드 멘트까지 골라드릴게요.</p>
+        <button class="cta" id="startBtn">고민 뒤집어보기 →</button>
+        <p class="intro-foot">30초, 질문 5개면 충분해요</p>
+      </div>
+    </section>
+
+    <!-- STEP 1 : RELATION -->
+    <section class="step" data-step="1">
+      <div class="eyebrow">STEP 1</div>
+      <h1 class="hl">어떤 사이인가요?</h1>
+      <p class="sub">가장 가까운 상황을 골라주세요.</p>
+      <div class="grid2" id="relationGrid"></div>
+    </section>
+
+    <!-- STEP 2 : AGE -->
+    <section class="step" data-step="2">
+      <div class="eyebrow">STEP 2</div>
+      <h1 class="hl">받는 분 나이대는요?</h1>
+      <p class="sub">연령대별 선물 트렌드를 반영해 추천을 조정해요.</p>
+      <div class="grid2" id="ageGrid"></div>
+    </section>
+
+    <!-- STEP 3 : STYLE -->
+    <section class="step" data-step="3">
+      <div class="eyebrow">STEP 3</div>
+      <h1 class="hl">어떤 느낌이 좋을까요?</h1>
+      <p class="sub">그 사람 성향, 혹은 선물의 느낌을 골라주세요.</p>
+      <div class="grid2" id="styleGrid"></div>
+    </section>
+
+    <!-- STEP 4 : BUDGET -->
+    <section class="step" data-step="4">
+      <div class="eyebrow">STEP 4</div>
+      <h1 class="hl">예산은 어느 정도로 볼까요?</h1>
+      <p class="sub">부담 없는 선에서 골라주세요.</p>
+      <div class="chiprow" id="budgetRow"></div>
+    </section>
+
+    <!-- STEP 5 : PERSONALIZE -->
+    <section class="step" data-step="5">
+      <div class="eyebrow">STEP 5</div>
+      <h1 class="hl">마지막으로 몇 가지만요</h1>
+      <p class="sub">선택 사항이에요. 건너뛰어도 괜찮아요.</p>
+
+      <div class="field-label">이런 건 별로예요 (복수 선택 가능)</div>
+      <div class="chiprow" id="avoidRow"></div>
+
+      <div class="field-label">받을 사람 이름/애칭</div>
+      <input type="text" id="nameInput" placeholder="예: 지민, 팀장님 (선택)" maxlength="12">
+
+      <div class="field-label">선물 멘트 톤</div>
+      <div class="chiprow" id="toneRow"></div>
+    </section>
+
+    <!-- STEP 6 : LOADING -->
+    <section class="step" data-step="6">
+      <div class="loading-wrap">
+        <svg class="ribbon-spin" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="34" stroke="#232F52" stroke-width="8"/>
+          <path d="M40 6C58.7777 6 74 21.2223 74 40" stroke="#FFC857" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+        <p class="display" style="font-size:16px; color:var(--ink);">리본을 풀고 있어요…</p>
+        <p>연령대 트렌드 + 취향 + 예산 매칭 중</p>
+      </div>
+    </section>
+
+    <!-- STEP 7 : RESULT -->
+    <section class="step" data-step="7">
+      <div class="scrollpad">
+        <div class="result-head">
+          <div class="eyebrow">RESULT</div>
+          <h1 class="hl">이렇게 뒤집어봤어요</h1>
+        </div>
+        <p class="databox">🔎 이 추천은 <b>네이버 데이터랩 쇼핑인사이트</b>의 연령별 클릭 트렌드와, <b>카카오 선물하기</b>가 매 시즌 공개하는 연령대별 큐레이션 패턴(효도선물엔 건강·상품권·패션, 명절 중장년 선물엔 건강식품·명품·뷰티 등)을 참고해 설계했어요.</p>
+        <div id="resultList"></div>
+
+        <div class="feedback-panel">
+          <div class="fp-head">💌 이 선물, 실제로 줬다면 어땠을까요?</div>
+          <p class="fp-sub">카드마다 반응을 남겨보세요. 실제 서비스에서는 이 후기가 쌓여 추천이 점점 더 정확해져요.</p>
+          <p class="fp-counter" id="fpCounter">이 세션에서 남긴 후기 · 0건</p>
+        </div>
+
+        <button class="restart" id="restartBtn">↺ 처음부터 다시 해보기</button>
+        <p class="footnote" id="footnoteText">* 이 프로토타입은 101개 샘플 데이터(실제 트렌드·가격대를 참고해 구성) + 연령별 트렌드 가중치로 매칭돼요. 후기는 이 브라우저 세션에서만 임시로 쌓여요.<br>실제 서비스에서는 쇼핑몰 제휴 API로 실시간 가격·재고를 연결하고, 서버 DB에 후기를 누적해 추천 정확도를 계속 개선합니다.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="bottombar" id="bottombar">
+    <button class="btn btn-ghost" id="backBtn">이전</button>
+    <button class="btn btn-next" id="nextBtn" disabled>다음</button>
+  </div>
+
+</div>
+
+<!-- 로드 순서 중요: supabase → data → backend → matching → app -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="js/data.js" defer></script>
+<script src="js/backend.js" defer></script>
+<script src="js/matching.js" defer></script>
+<script src="js/app.js" defer></script>
+</body>
+</html>
