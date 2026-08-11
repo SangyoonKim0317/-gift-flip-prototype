@@ -43,7 +43,7 @@ const BUDGETS = [
   {k:'10000-30000', t:'1~3만원', lo:10000, hi:30000},
   {k:'30000-50000', t:'3~5만원', lo:30000, hi:50000},
   {k:'50000-100000', t:'5~10만원', lo:50000, hi:100000},
-  {k:'100000-300000', t:'10만원 이상', lo:100000, hi:300000},
+  {k:'100000-300000', t:'10만원 이상', lo:100000, hi:Infinity}, 
 ];
 
 // STEP 5: 피하고 싶은 카테고리 (복수 선택)
@@ -221,7 +221,7 @@ const GIFTS = [
   // -- 효도선물 / 40~50대 이상 --
   {name:'종아리 부항 마사지기', ic:'🦵', styles:['실용'], relations:['family'], min:80000, max:150000, tags:['디지털'], ageBoost:['40대','50대 이상']},
   {name:'온열 찜질 매트', ic:'🔥', styles:['실용'], relations:['family'], min:40000, max:90000, tags:['홈'], ageBoost:['40대','50대 이상']},
-  {name:'오메가3·루테인·칼슘 종합영양제 세트', ic:'💊', styles:['무난'], relations:['family','boss'], min:50000, max:100000, tags:['건강'], ageBoost:['40대','50대 이상']},
+  {name:'오메가3·루테인·칼슘 종합영양제 세트', ic:'💊', styles:['무난'], relations:['family','boss'], min:50000, max:100000, tags:['건강', '식품주류'], ageBoost:['40대','50대 이상']},
   {name:'카네이션 + 용돈박스', ic:'🌷', styles:['감성','무난'], relations:['family'], min:10000, max:30000, tags:['상품권'], ageBoost:['40대','50대 이상']},
   {name:'곶감 선물세트', ic:'🟠', styles:['무난'], relations:['family','boss'], min:30000, max:80000, tags:['식품주류'], ageBoost:['40대','50대 이상']},
   {name:'제주 감귤 · 한라봉 혼합세트', ic:'🍊', styles:['무난'], relations:['family','boss'], min:25000, max:80000, tags:['식품주류'], ageBoost:['30대','40대','50대 이상']},
