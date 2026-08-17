@@ -184,14 +184,15 @@ input[type="text"]:focus, .chip:focus-visible, .choice-card:focus-visible, .cta:
   background:var(--bg-0); border:1px dashed var(--line); border-radius:12px;
   padding:12px 13px; font-size:13.5px; line-height:1.6; margin-bottom:10px; color:var(--ink);
 }
-.gc-actions{ display:flex; gap:8px; }
+.gc-actions{ display:flex; gap:6px; flex-wrap:wrap; }
 .mini-btn{
-  flex:1; border-radius:100px; border:1.5px solid var(--line); background:transparent; color:var(--ink);
-  padding:10px; font-size:12.5px; cursor:pointer; font-family:'Noto Sans KR'; font-weight:700;
+  flex:1; min-width:88px; border-radius:100px; border:1.5px solid var(--line); background:transparent; color:var(--ink);
+  padding:9px 6px; font-size:12px; cursor:pointer; font-family:'Noto Sans KR'; font-weight:700;
   text-decoration:none; text-align:center; display:block; transition:all .15s;
 }
 .mini-btn.copy.copied{ background:var(--mint); color:#0A2A20; border-color:var(--mint); }
 .mini-btn.buy{ background:var(--coral); color:#1B1000; border-color:var(--coral); }
+.mini-btn.buy-alt{ color:var(--muted); }
 
 .restart{
   width:100%; margin:6px 0 2px; background:transparent; border:1.5px solid var(--line);
