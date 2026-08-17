@@ -64,10 +64,21 @@ function scoreItem(item){
   return score;
 }
 
+/**
+ * 선물 메시지(멘트) 조립
+ * - 톤(state.tone)과 존댓말/반말(state.speech) 두 축으로 TAG_CONTEXTS에서 문구를 뽑는다.
+ * - relation이 'boss'(직장 상사·어려운 동료)이면, STEP 5에서 사용자가 뭘 골랐든
+ *   무조건 '존댓말'을 사용하도록 여기서 한 번 더 강제한다.
+ *   (app.js의 updateSpeechConstraint()가 UI 단에서도 막아주지만,
+ *    데이터/상태가 꼬이는 예외 상황에 대비해 메시지 생성 시점에도 이중으로 방어)
+ */
 function buildMessage(itemName, tag) {
   const name = state.name;
   let tone = state.tone || '다정하게';
   if (tone === '솔직하게') tone = '담백하게';
+
+  let speech = state.speech || '반말';
+  if (state.relation === 'boss') speech = '존댓말';
 
   let validTag = tag;
   if (!validTag || !TAG_CONTEXTS[validTag]) {
@@ -80,8 +91,15 @@ function buildMessage(itemName, tag) {
 
   if (itemName.includes('케이크') || itemName.includes('디저트')) validTag = '식품주류';
 
-  const tagData = TAG_CONTEXTS[validTag] || TAG_CONTEXTS['상품권'];
-  const messages = tagData[tone] || tagData['다정하게'];
+// 수정된 코드
+const tagData = TAG_CONTEXTS[validTag] || TAG_CONTEXTS['상품권'];
+const toneData = tagData[tone] || tagData['다정하게'];
+
+// 1) 사용자가 선택한 speech(반말)가 없으면 -> 존댓말 -> 반말 순으로 안전하게 찾아옵니다.
+let messages = toneData[speech];
+if (!messages || messages.length === 0) {
+  messages = toneData['존댓말'] || toneData['반말'] || [];
+}
   const hookText = messages[Math.floor(Math.random() * messages.length)];
 
   let prefix = '';
@@ -90,11 +108,12 @@ function buildMessage(itemName, tag) {
     const isHangul = lastChar >= 0xAC00 && lastChar <= 0xD7A3;
     const hasBatchim = isHangul ? (lastChar - 0xAC00) % 28 > 0 : false;
 
-    if (tone === '장난스럽게' || tone === '다정하게') {
+    if (speech === '존댓말') {
+      // 존댓말일 때는 톤과 무관하게 항상 정중한 호칭("~님,")을 붙임
+      prefix = `${name} 님, `;
+    } else if (tone === '장난스럽게' || tone === '다정하게') {
       const call = isHangul ? (hasBatchim ? '아' : '야') : '';
       prefix = `${name}${call}, `;
-    } else if (tone === '격식있게') {
-      prefix = `${name} 님, `;
     } else {
       prefix = `${name}, `;
     }
