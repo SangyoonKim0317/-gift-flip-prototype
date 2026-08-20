@@ -20,20 +20,25 @@
 // STEP 1: 선물 받는 사람과의 관계
 // k = 내부 식별 키 (matching.js의 scoreItem, GIFTS.relations 와 매칭)
 // ic = 아이콘 이모지, t = 카드 제목, d = 카드 부제
+// rp = 추천 이유 문장에 들어갈 형태. 라벨에 따라 조사가 '~에' / '~에게'로 갈리므로
+//      ("알아가는 사이에" vs "연인에게") 문장용 표현을 따로 둔다.
 const RELATIONS = [
-  {k:'sum', ic:'🫣', t:'썸 타는 사이', d:'수위 조절이 관건'},
-  {k:'sogaeting', ic:'🤝', t:'소개팅 · 첫 만남', d:'답례, 부담 없게'},
-  {k:'closefriend', ic:'😄', t:'친한 친구', d:'매년 뭘 살지 고민'},
-  {k:'longfriend', ic:'📱', t:'오랜만에 연락된 친구', d:'얼마나 챙길지 애매함'},
-  {k:'boss', ic:'💼', t:'직장 동료 · 어려운 사이', d:'가벼워도 무거워도 곤란'},
-  {k:'family', ic:'🏠', t:'가족', d:'용돈 말고 뭘 드리지'},
+  {k:'sum', ic:'🫣', t:'알아가는 사이', d:'부담 없게', rp:'알아가는 사이에'},
+  {k:'couple', ic:'💞', t:'연인', d:'기대치가 제일 높음', rp:'연인에게'},
+  {k:'closefriend', ic:'😄', t:'친한 친구', d:'매년 뭘 줘야 할지 고민', rp:'친한 친구에게'},
+  {k:'longfriend', ic:'📱', t:'오랜만에 연락된 친구', d:'얼마나 챙길지 애매함', rp:'오랜만에 연락된 친구에게'},
+  {k:'boss', ic:'💼', t:'직장 동료 · 어려운 사이', d:'가벼워도 무거워도 곤란', rp:'직장 동료 · 어려운 사이에'},
+  {k:'family', ic:'🏠', t:'가족', d:'용돈 말고 뭘 드리지', rp:'가족에게'},
 ];
 // STEP 3: 선물의 느낌/스타일 (GIFTS.styles 와 매칭)
+// t(라벨)는 결과 카드의 추천 이유 문장에도 그대로 들어간다.
+//   예: "'실용파' 취향에도 잘 맞아요."
+// 그래서 네 항목을 모두 '-파'로 통일해 문장에 넣어도 어색하지 않게 맞췄다.
 const STYLES = [
-  {k:'실용', ic:'🔧', t:'실용파', d:'꼭 필요한 걸로'},
-  {k:'감성', ic:'💌', t:'감성파', d:'마음이 담긴 걸로'},
-  {k:'힙함', ic:'✨', t:'힙하게', d:'트렌디하고 재밌게'},
-  {k:'무난', ic:'🙂', t:'아무거나 좋아함', d:'무난한 게 최고'},
+  {k:'실용', ic:'🧰', t:'실용파', d:'쓸모부터 따지는 편'},
+  {k:'감성', ic:'💝', t:'감성파', d:'의미와 분위기를 챙기는 편'},
+  {k:'힙함', ic:'🔥', t:'트렌드파', d:'요즘 뜨는 걸 좋아하는 편'},
+  {k:'무난', ic:'🙂', t:'무난파', d:'튀지 않는 게 편한 편'},
 ];
 
 // STEP 4: 예산 구간
@@ -137,6 +142,24 @@ const TAG_CONTEXTS = {
     '장난스럽게': ['이거 입고/차고 사람답게 하고 다녀보자ㅋㅋ', '착샷 인증 바로 날려라ㅋㅋ', '잘 어울리면 내 안목 인정해줘라ㅋㅋ', '이거 입고 인생샷 하나 건져봐라ㅋㅋ', '패션왕 등극 가즈아ㅋㅋ'],
     '격식있게': ['일상에 기분 좋은 포인트가 되었으면 좋겠습니다.', '기분 좋은 순간마다 함께할 수 있는 선물이 되었으면 좋겠습니다.', '마음에 드는 선물이 되었으면 좋겠습니다.', '멋스러운 순간마다 함께하는 선물이 되길 바랍니다.', '일상에 세련된 포인트가 되었으면 좋겠습니다.']
   },
+  '취미': {
+    '다정하게': ['이거 하면서 스트레스 좀 풀었으면 좋겠다!', '요즘 재밌어 보여서 너 생각하고 골라봤어ㅎㅎ', '쉴 때 이거 하면서 기분 전환했으면 해!', '취향에 맞을 것 같아서 신경 써서 골랐어 :)'],
+    '담백하게': ['심심할 때 갖고 놀기 좋을 거야.', '재밌게 즐길 수 있는 걸로 골랐어.', '쉬는 날에 꺼내 쓰기 좋을 거야.', '취미 생활에 보탬이 될 것 같아서 준비했어.'],
+    '장난스럽게': ['이거 하다가 밤새우지는 마라ㅋㅋ', '이걸로 나랑 한판 붙자ㅋㅋ', '재밌게 갖고 놀아라ㅋㅋ', '이거 받고 폐인 되면 내 책임 아니다ㅋㅋ'],
+    '격식있게': ['여가 시간에 즐겁게 활용하시길 바랍니다.', '바쁜 일상 속 작은 즐거움이 되었으면 좋겠습니다.', '편안한 휴식과 취미 생활에 도움이 되길 바랍니다.', '즐거운 시간 보내시는 데 보탬이 되길 바랍니다.']
+  },
+  '반려': {
+    '다정하게': ['너 말고 그 아이한테도 선물 하나 챙겼어ㅎㅎ', '같이 사는 가족한테도 주고 싶어서 골랐어 :)', '둘 다 건강하고 행복했으면 좋겠다!', '맛있게 먹는 모습 보면 너도 기분 좋아질 것 같아서!'],
+    '담백하게': ['아이 간식으로 무난한 걸로 골랐어.', '잘 먹을 것 같아서 준비했어.', '평소에 챙겨주기 좋을 거야.', '자주 주기 좋은 걸로 골랐어.'],
+    '장난스럽게': ['네 것보다 좋은 거 샀다ㅋㅋ', '이거 주고 사랑받아라ㅋㅋ', '너 말고 얘가 더 좋아할 듯ㅋㅋ', '집사 노릇 제대로 해봐라ㅋㅋ'],
+    '격식있게': ['소중한 가족과 함께 즐거운 시간 보내시길 바랍니다.', '늘 건강하고 행복한 나날 되시길 바랍니다.', '작은 정성이 기쁨이 되었으면 좋겠습니다.', '함께하는 시간이 더욱 즐거워지길 바랍니다.']
+  },
+  '기념': {
+    '다정하게': ['말로 다 못 할 것 같아서 이렇게 적어봤어. 생일 축하해!', '오늘 하루만큼은 네가 제일 주인공이었으면 좋겠어 :)', '늘 고맙다는 말 못 했는데, 이번엔 꼭 전하고 싶었어.', '생일 진심으로 축하하고, 올 한 해도 행복하길 바라!'],
+    '담백하게': ['생일 축하해. 좋은 하루 보내.', '별건 아니지만 마음은 담았어.', '축하하고, 앞으로도 잘 지내자.', '오늘 하루 즐겁게 보내길 바라.'],
+    '장난스럽게': ['생일 축하한다ㅋㅋ 한 살 더 먹은 거 축하해!', '편지 값이 더 나왔다ㅋㅋ 생일 축하해!', '이런 거 쓰는 사람 흔치 않다ㅋㅋ 감동해라!', '올해도 무사히 늙었구나ㅋㅋ 축하한다!'],
+    '격식있게': ['뜻깊은 날을 진심으로 축하드립니다.', '늘 건강하시고 좋은 일만 가득하시길 바랍니다.', '작은 마음이지만 진심을 담아 전해 드립니다.', '앞으로도 행복한 날들이 이어지시길 바랍니다.']
+  },
   '상품권': {
     '다정하게': ['갖고 싶은 거 골라서 기분 좋게 쓰라고 준비했어ㅎㅎ', '뭐가 좋을지 고민하다가 네가 원하는 걸 사는 게 좋을 것 같아서!', '필요한 거 살 때 조금이라도 도움이 되었으면 좋겠다.', '고르는 재미도 선물이니까 하고 싶은 거 마음껏 골라!', '네가 진짜 원하는 걸로 쓰라고 준비했어 :)'],
     '담백하게': ['뭐가 좋을지 고민하다가 상품권으로 골랐어.', '필요한 거 살 때 써.', '이게 제일 실용적인 것 같아서 골랐어.', '취향껏 골라 쓰라고 상품권으로 준비했어.', '가장 무난할 것 같아서 이걸로 골랐어.'],
@@ -150,6 +173,7 @@ const TAG_CONTEXTS = {
    예: RELATION_LABEL['closefriend'] === '친한 친구'
    matching.js의 computeResults()에서 추천 사유 문구를 만들 때 사용됨. */
 const RELATION_LABEL = Object.fromEntries(RELATIONS.map(r=>[r.k,r.t]));
+const RELATION_PHRASE = Object.fromEntries(RELATIONS.map(r=>[r.k, r.rp || (r.t + '에')]));
 const STYLE_LABEL = Object.fromEntries(STYLES.map(s=>[s.k,s.t]));
 const AGE_LABEL = Object.fromEntries(AGES.map(a=>[a.k,a.t]));
 
@@ -168,45 +192,45 @@ const AGE_LABEL = Object.fromEntries(AGES.map(a=>[a.k,a.t]));
                  태그만으로 걸러낼 수 없으므로, 미성년자(10대) 추천에서 무조건 배제하기
                  위한 전용 플래그. (matching.js의 scoreItem에서 검사) */
 const GIFTS = [
-  {name:'핸드크림 세트', ic:'🧴', styles:['감성','무난'], relations:['sum','sogaeting','closefriend','longfriend','family','boss'], min:15000, max:30000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
-  {name:'블루투스 이어폰', ic:'🎧', styles:['실용','힙함'], relations:['closefriend','sogaeting','sum','family'], min:30000, max:150000, tags:['디지털'], ageBoost:['10대','20대','30대']},
-  {name:'향초', ic:'🕯️', styles:['감성'], relations:['closefriend','sum','longfriend','sogaeting'], min:15000, max:40000, tags:['향','홈'], ageBoost:['20대','30대']},
-  {name:'감성 텀블러', ic:'🥤', styles:['실용','무난'], relations:['closefriend','sum','longfriend','family','boss','sogaeting'], min:15000, max:35000, tags:['홈'], ageBoost:['10대','20대','30대','40대']},
-  {name:'손편지 + 미니 꽃다발', ic:'💐', styles:['감성'], relations:['closefriend','longfriend','family','sum'], min:5000, max:20000, tags:[], ageBoost:['10대','20대','30대','40대','50대 이상']},
-  {name:'카페 · 디저트 기프티콘', ic:'🍰', styles:['무난'], relations:['closefriend','sum','longfriend','family','boss','sogaeting'], min:5000, max:15000, tags:['상품권','식품주류'], ageBoost:['10대','20대','30대','40대','50대 이상']},
+  {name:'핸드크림 세트', ic:'🧴', styles:['감성','무난'], relations:['sum','couple','closefriend','longfriend','family','boss'], min:15000, max:30000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
+  {name:'블루투스 이어폰', ic:'🎧', styles:['실용','힙함'], relations:['closefriend','sum','couple','family'], min:30000, max:150000, tags:['디지털'], ageBoost:['10대','20대','30대']},
+  {name:'향초', ic:'🕯️', styles:['감성'], relations:['closefriend','sum','couple','longfriend'], min:15000, max:40000, tags:['향','홈'], ageBoost:['20대','30대']},
+  {name:'감성 텀블러', ic:'🥤', styles:['실용','무난'], relations:['closefriend','sum','couple','longfriend','family','boss'], min:15000, max:35000, tags:['홈'], ageBoost:['10대','20대','30대','40대']},
+  {name:'손편지 + 미니 꽃다발', ic:'💐', styles:['감성'], relations:['closefriend','longfriend','family','sum','couple'], min:5000, max:20000, tags:['기념'], ageBoost:['10대','20대','30대','40대','50대 이상']},
+  {name:'카페 · 디저트 기프티콘', ic:'🍰', styles:['무난'], relations:['closefriend','sum','longfriend','family','boss'], min:5000, max:15000, tags:['상품권','식품주류'], ageBoost:['10대','20대','30대','40대','50대 이상']},
   {name:'무선 충전기', ic:'🔌', styles:['실용'], relations:['boss','closefriend','family','longfriend'], min:20000, max:40000, tags:['디지털'], ageBoost:['10대','20대','30대']},
   {name:'목 · 어깨 마사지기', ic:'💆', styles:['실용'], relations:['family','boss','closefriend'], min:30000, max:80000, tags:['디지털'], ageBoost:['30대','40대','50대 이상']},
-  {name:'미니 향수', ic:'🌸', styles:['감성','힙함'], relations:['sum','sogaeting','closefriend'], min:20000, max:60000, tags:['향','뷰티'], ageBoost:['10대','20대','30대']},
-  {name:'캐릭터 인형 · 키링', ic:'🧸', styles:['힙함'], relations:['closefriend','sum','longfriend'], min:10000, max:30000, tags:[], ageBoost:['10대','20대']},
-  {name:'브랜드 양말 세트', ic:'🧦', styles:['무난','실용'], relations:['closefriend','sum','longfriend','family','boss','sogaeting'], min:10000, max:25000, tags:['패션'], ageBoost:['10대','20대','30대','40대','50대 이상']},
-  {name:'폼롤러 홈트 세트', ic:'🏋️', styles:['실용'], relations:['closefriend','family'], min:15000, max:35000, tags:[], ageBoost:['20대','30대']},
+  {name:'미니 향수', ic:'🌸', styles:['감성','힙함'], relations:['sum','couple','closefriend'], min:20000, max:60000, tags:['향','뷰티'], ageBoost:['10대','20대','30대']},
+  {name:'캐릭터 인형 · 키링', ic:'🧸', styles:['힙함'], relations:['closefriend','sum','couple','longfriend'], min:10000, max:30000, tags:['취미'], ageBoost:['10대','20대']},
+  {name:'브랜드 양말 세트', ic:'🧦', styles:['무난','실용'], relations:['closefriend','sum','couple','longfriend','family','boss'], min:10000, max:25000, tags:['패션'], ageBoost:['10대','20대','30대','40대','50대 이상']},
+  {name:'폼롤러 홈트 세트', ic:'🏋️', styles:['실용'], relations:['couple','closefriend','family'], min:15000, max:35000, tags:['건강'], ageBoost:['20대','30대']},
   {name:'감성 다이어리 · 플래너', ic:'📔', styles:['감성','실용'], relations:['closefriend','longfriend','boss'], min:10000, max:25000, tags:['문구'], ageBoost:['10대','20대','30대']},
   {name:'미니 다육이 화분', ic:'🪴', styles:['감성'], relations:['closefriend','longfriend','boss','family'], min:10000, max:20000, tags:['식물'], ageBoost:['20대','30대','40대']},
   {name:'고급 볼펜', ic:'🖊️', styles:['실용','무난'], relations:['boss','family'], min:20000, max:50000, tags:['문구'], ageBoost:['30대','40대','50대 이상']},
   {name:'홍삼 · 건강즙 세트', ic:'🌿', styles:['무난'], relations:['family','boss'], min:30000, max:80000, tags:['건강','식품주류'], ageBoost:['40대','50대 이상']},
-  {name:'와인 · 전통주', ic:'🍷', styles:['무난','힙함'], relations:['boss','family','closefriend'], min:30000, max:100000, tags:['식품주류'], ageBoost:['30대','40대','50대 이상'], alcohol:true},
-  {name:'우정 팔찌', ic:'📿', styles:['감성'], relations:['closefriend','sum'], min:10000, max:30000, tags:['액세서리'], ageBoost:['10대','20대']},
-  {name:'미니 블루투스 스피커', ic:'🔊', styles:['힙함','실용'], relations:['closefriend','sum','sogaeting','longfriend'], min:30000, max:80000, tags:['디지털'], ageBoost:['10대','20대','30대']},
-  {name:'반신욕 입욕제 세트', ic:'🛁', styles:['감성'], relations:['closefriend','family','longfriend'], min:15000, max:30000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
+  {name:'와인 · 전통주', ic:'🍷', styles:['무난','힙함'], relations:['couple','boss','family','closefriend'], min:30000, max:100000, tags:['식품주류'], ageBoost:['30대','40대','50대 이상'], alcohol:true},
+  {name:'우정 팔찌', ic:'📿', styles:['감성'], relations:['closefriend','sum','couple'], min:10000, max:30000, tags:['액세서리'], ageBoost:['10대','20대']},
+  {name:'미니 블루투스 스피커', ic:'🔊', styles:['힙함','실용'], relations:['closefriend','sum','couple','longfriend'], min:30000, max:80000, tags:['디지털'], ageBoost:['10대','20대','30대']},
+  {name:'반신욕 입욕제 세트', ic:'🛁', styles:['감성'], relations:['couple','closefriend','family','longfriend'], min:15000, max:30000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
   {name:'레터링 케이크 기프티콘', ic:'🎂', styles:['무난','감성'], relations:['closefriend','family','sum'], min:20000, max:40000, tags:['상품권','식품주류'], ageBoost:['10대','20대','30대']},
-  {name:'니트 · 머플러', ic:'🧣', styles:['실용','감성'], relations:['sum','family','sogaeting','closefriend'], min:20000, max:60000, tags:['패션'], ageBoost:['20대','30대','40대','50대 이상']},
-  {name:'즉석카메라 필름 세트', ic:'📸', styles:['힙함'], relations:['closefriend','sum','sogaeting'], min:20000, max:50000, tags:[], ageBoost:['10대','20대']},
+  {name:'니트 · 머플러', ic:'🧣', styles:['실용','감성'], relations:['sum','couple','family','closefriend'], min:20000, max:60000, tags:['패션'], ageBoost:['20대','30대','40대','50대 이상']},
+  {name:'즉석카메라 필름 세트', ic:'📸', styles:['힙함'], relations:['closefriend','sum','couple'], min:20000, max:50000, tags:['취미'], ageBoost:['10대','20대']},
   {name:'명절 과일 · 한과 세트', ic:'🍎', styles:['무난'], relations:['family','boss'], min:30000, max:100000, tags:['식품주류'], ageBoost:['40대','50대 이상']},
-  {name:'스킨케어 세트', ic:'🧴', styles:['감성','무난'], relations:['family','closefriend','longfriend'], min:20000, max:60000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
+  {name:'스킨케어 세트', ic:'🧴', styles:['감성','무난'], relations:['couple','family','closefriend','longfriend'], min:20000, max:60000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
   {name:'모바일 문화상품권', ic:'🎟️', styles:['실용','무난'], relations:['boss','longfriend','closefriend'], min:10000, max:50000, tags:['상품권'], ageBoost:['10대','20대','30대','40대','50대 이상']},
 
   /* ---- 여기부터 추가된 12종 (예산·연령·스타일 커버리지 확장용) ---- */
-  {name:'감성 무드등', ic:'🪔', styles:['감성'], relations:['closefriend','sum','family','boss'], min:15000, max:35000, tags:['홈'], ageBoost:['20대','30대']},
+  {name:'감성 무드등', ic:'🪔', styles:['감성'], relations:['closefriend','sum','couple','family','boss'], min:15000, max:35000, tags:['홈'], ageBoost:['20대','30대']},
   {name:'미니 가습기', ic:'💧', styles:['실용'], relations:['family','boss','closefriend'], min:20000, max:45000, tags:['디지털'], ageBoost:['20대','30대','40대']},
-  {name:'수제 쿠키 세트', ic:'🍪', styles:['감성'], relations:['closefriend','sum','longfriend'], min:10000, max:25000, tags:['식품주류'], ageBoost:['10대','20대']},
+  {name:'수제 쿠키 세트', ic:'🍪', styles:['감성'], relations:['closefriend','sum','couple','longfriend'], min:10000, max:25000, tags:['식품주류'], ageBoost:['10대','20대']},
   {name:'무선 마우스', ic:'🖱️', styles:['실용'], relations:['boss','family'], min:15000, max:30000, tags:['디지털'], ageBoost:['20대','30대','40대']},
   {name:'스터디 플래너 + 포스트잇 세트', ic:'📝', styles:['실용','감성'], relations:['closefriend','family'], min:8000, max:18000, tags:['문구'], ageBoost:['10대','20대']},
-  {name:'감성 캔들워머', ic:'🕯️', styles:['감성'], relations:['closefriend','sum','longfriend'], min:25000, max:45000, tags:['홈'], ageBoost:['20대','30대']},
-  {name:'극세사 니트 담요', ic:'🧶', styles:['실용','감성'], relations:['family','closefriend'], min:20000, max:40000, tags:['홈'], ageBoost:['30대','40대','50대 이상']},
-  {name:'휴대용 미니 선풍기', ic:'🌀', styles:['실용'], relations:['closefriend','sum','sogaeting','family'], min:10000, max:25000, tags:['디지털'], ageBoost:['10대','20대']},
-  {name:'미니 방향제 키링', ic:'🔑', styles:['힙함'], relations:['closefriend','sum','sogaeting'], min:8000, max:18000, tags:['향','액세서리'], ageBoost:['10대','20대']},
-  {name:'심플 손목시계', ic:'⌚', styles:['감성','힙함'], relations:['sum','sogaeting','family'], min:50000, max:150000, tags:['액세서리'], ageBoost:['20대','30대','40대']},
-  {name:'프리미엄 실크 스카프', ic:'🧣', styles:['감성','무난'], relations:['family','boss'], min:80000, max:200000, tags:['패션'], ageBoost:['40대','50대 이상']},
+  {name:'감성 캔들워머', ic:'🕯️', styles:['감성'], relations:['closefriend','sum','couple','longfriend'], min:25000, max:45000, tags:['홈'], ageBoost:['20대','30대']},
+  {name:'극세사 니트 담요', ic:'🧶', styles:['실용','감성'], relations:['couple','family','closefriend'], min:20000, max:40000, tags:['홈'], ageBoost:['30대','40대','50대 이상']},
+  {name:'휴대용 미니 선풍기', ic:'🌀', styles:['실용'], relations:['closefriend','sum','couple','family'], min:10000, max:25000, tags:['디지털'], ageBoost:['10대','20대']},
+  {name:'미니 방향제 키링', ic:'🔑', styles:['힙함'], relations:['closefriend','sum','couple'], min:8000, max:18000, tags:['향','액세서리'], ageBoost:['10대','20대']},
+  {name:'심플 손목시계', ic:'⌚', styles:['감성','힙함'], relations:['sum','couple','family'], min:50000, max:150000, tags:['액세서리'], ageBoost:['20대','30대','40대']},
+  {name:'프리미엄 실크 스카프', ic:'🧣', styles:['감성','무난'], relations:['couple','family','boss'], min:80000, max:200000, tags:['패션'], ageBoost:['40대','50대 이상']},
 
   /* ---- 여기부터 추가된 60종 (네이버 쇼핑/블로그/카드사 리포트 등에서 확인한
      실제 트렌드·가격대를 참고해 카테고리별 빈틈을 채운 샘플 데이터) ----
@@ -225,93 +249,140 @@ const GIFTS = [
 
   // -- 직장 상사 / 격식 있는 관계 --
   {name:'프리미엄 백화점 통합상품권', ic:'💳', styles:['무난'], relations:['boss','family'], min:100000, max:300000, tags:['상품권'], ageBoost:['30대','40대','50대 이상']},
-  {name:'와인 오프너 세트', ic:'🍾', styles:['실용','감성'], relations:['boss','family'], min:20000, max:40000, tags:['홈'], ageBoost:['30대','40대','50대 이상']},
-  {name:'프리미엄 가죽 카드지갑', ic:'👛', styles:['무난','감성'], relations:['boss','family','sum'], min:80000, max:200000, tags:['액세서리'], ageBoost:['30대','40대']},
+  {name:'와인 오프너 세트', ic:'🍾', styles:['실용','감성'], relations:['couple','boss','family'], min:20000, max:40000, tags:['홈'], ageBoost:['30대','40대','50대 이상']},
+  {name:'프리미엄 가죽 카드지갑', ic:'👛', styles:['무난','감성'], relations:['boss','family','sum','couple'], min:80000, max:200000, tags:['액세서리'], ageBoost:['30대','40대']},
 
   // -- 연인 / 썸 / 소개팅 --
-  {name:'애플워치 SE급 스마트워치', ic:'⌚', styles:['실용','힙함'], relations:['sum','closefriend'], min:300000, max:450000, tags:['디지털'], ageBoost:['20대','30대']},
-  {name:'LED 마스크 뷰티디바이스', ic:'💡', styles:['감성','실용'], relations:['sum','closefriend','family'], min:200000, max:450000, tags:['뷰티'], ageBoost:['30대','40대']},
-  {name:'이너퍼퓸 캡슐 세트', ic:'🧴', styles:['감성'], relations:['sum','sogaeting'], min:15000, max:30000, tags:['향'], ageBoost:['20대','30대']},
-  {name:'인테리어 디퓨저 세트', ic:'🌬️', styles:['감성'], relations:['closefriend','sum','longfriend'], min:20000, max:40000, tags:['향'], ageBoost:['20대','30대']},
-  {name:'기계식 키보드', ic:'⌨️', styles:['실용','힙함'], relations:['sum','closefriend','boss'], min:60000, max:150000, tags:['디지털'], ageBoost:['20대','30대']},
-  {name:'남성 스킨케어 3종 세트', ic:'🧴', styles:['실용','무난'], relations:['sum','family'], min:30000, max:60000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
-  {name:'위스키 12년 싱글몰트', ic:'🥃', styles:['무난','힙함'], relations:['boss','family','closefriend'], min:70000, max:150000, tags:['식품주류'], ageBoost:['30대','40대','50대 이상'], alcohol:true},
-  {name:'러닝화', ic:'👟', styles:['실용','힙함'], relations:['sum','closefriend','family'], min:120000, max:200000, tags:['패션'], ageBoost:['20대','30대']},
-  {name:'요가매트 + 필라테스 밴드 세트', ic:'🧘', styles:['실용'], relations:['closefriend','family'], min:20000, max:40000, tags:['건강'], ageBoost:['20대','30대','40대']},
+  {name:'애플워치 SE급 스마트워치', ic:'⌚', styles:['실용','힙함'], relations:['sum','couple','closefriend'], min:300000, max:450000, tags:['디지털'], ageBoost:['20대','30대']},
+  {name:'LED 마스크 뷰티디바이스', ic:'💡', styles:['감성','실용'], relations:['sum','couple','closefriend','family'], min:200000, max:450000, tags:['뷰티'], ageBoost:['30대','40대']},
+  {name:'이너퍼퓸 캡슐 세트', ic:'🧴', styles:['감성'], relations:['sum','couple'], min:15000, max:30000, tags:['향'], ageBoost:['20대','30대']},
+  {name:'인테리어 디퓨저 세트', ic:'🌬️', styles:['감성'], relations:['closefriend','sum','couple','longfriend'], min:20000, max:40000, tags:['향'], ageBoost:['20대','30대']},
+  {name:'기계식 키보드', ic:'⌨️', styles:['실용','힙함'], relations:['sum','couple','closefriend','boss'], min:60000, max:150000, tags:['디지털'], ageBoost:['20대','30대']},
+  {name:'남성 스킨케어 3종 세트', ic:'🧴', styles:['실용','무난'], relations:['sum','couple','family'], min:30000, max:60000, tags:['뷰티'], ageBoost:['20대','30대','40대']},
+  {name:'위스키 12년 싱글몰트', ic:'🥃', styles:['무난','힙함'], relations:['couple','boss','family','closefriend'], min:70000, max:150000, tags:['식품주류'], ageBoost:['30대','40대','50대 이상'], alcohol:true},
+  {name:'러닝화', ic:'👟', styles:['실용','힙함'], relations:['sum','couple','closefriend','family'], min:120000, max:200000, tags:['패션'], ageBoost:['20대','30대']},
+  {name:'요가매트 + 필라테스 밴드 세트', ic:'🧘', styles:['실용'], relations:['couple','closefriend','family'], min:20000, max:40000, tags:['건강'], ageBoost:['20대','30대','40대']},
 
   // -- 10대 / 학생 --
-  {name:'스마트 토이 피규어', ic:'🧸', styles:['힙함'], relations:['family','closefriend'], min:20000, max:50000, tags:['액세서리'], ageBoost:['10대']},
-  {name:'인스탁스 미니 즉석카메라', ic:'📷', styles:['힙함'], relations:['closefriend','sum','sogaeting'], min:70000, max:95000, tags:['디지털'], ageBoost:['10대','20대']},
-  {name:'캐릭터 콜라보 그립톡 + 파우치 세트', ic:'📱', styles:['힙함'], relations:['closefriend','sum','sogaeting'], min:8000, max:15000, tags:['액세서리'], ageBoost:['10대']},
-  {name:'브랜드 볼캡', ic:'🧢', styles:['힙함'], relations:['closefriend','sum','sogaeting'], min:20000, max:40000, tags:['패션'], ageBoost:['10대','20대']},
-  {name:'셀카봉 겸 미니 삼각대', ic:'🤳', styles:['힙함'], relations:['closefriend','sum','sogaeting'], min:10000, max:20000, tags:['디지털'], ageBoost:['10대','20대']},
-  {name:'립밤 · 틴트 세트', ic:'💄', styles:['감성','무난'], relations:['closefriend','sum','sogaeting'], min:10000, max:20000, tags:['뷰티'], ageBoost:['10대','20대']},
+  {name:'스마트 토이 피규어', ic:'🧸', styles:['힙함'], relations:['couple','family','closefriend'], min:20000, max:50000, tags:['액세서리'], ageBoost:['10대']},
+  {name:'인스탁스 미니 즉석카메라', ic:'📷', styles:['힙함'], relations:['closefriend','sum','couple'], min:70000, max:95000, tags:['디지털'], ageBoost:['10대','20대']},
+  {name:'캐릭터 콜라보 그립톡 + 파우치 세트', ic:'📱', styles:['힙함'], relations:['closefriend','sum','couple'], min:8000, max:15000, tags:['액세서리'], ageBoost:['10대']},
+  {name:'브랜드 볼캡', ic:'🧢', styles:['힙함'], relations:['closefriend','sum','couple'], min:20000, max:40000, tags:['패션'], ageBoost:['10대','20대']},
+  {name:'셀카봉 겸 미니 삼각대', ic:'🤳', styles:['힙함'], relations:['closefriend','sum','couple'], min:10000, max:20000, tags:['디지털'], ageBoost:['10대','20대']},
+  {name:'립밤 · 틴트 세트', ic:'💄', styles:['감성','무난'], relations:['closefriend','sum','couple'], min:10000, max:20000, tags:['뷰티'], ageBoost:['10대','20대']},
   {name:'뽀모도로 공부 타이머', ic:'⏲️', styles:['실용'], relations:['family','closefriend'], min:25000, max:45000, tags:['디지털'], ageBoost:['10대','20대']},
 
   // -- 홈 / 오피스 / 기타 --
   {name:'탁상 미니 화이트보드 + 플래너 세트', ic:'🗒️', styles:['실용'], relations:['boss','family','closefriend'], min:12000, max:25000, tags:['문구'], ageBoost:['20대','30대','40대']},
-  {name:'LED 무드조명 탁상시계', ic:'🕰️', styles:['감성'], relations:['closefriend','family','boss'], min:15000, max:30000, tags:['홈'], ageBoost:['20대','30대']},
-  {name:'기모 원마일웨어 실내복 세트', ic:'🧥', styles:['실용'], relations:['family'], min:25000, max:50000, tags:['패션'], ageBoost:['40대','50대 이상']},
+  {name:'LED 무드조명 탁상시계', ic:'🕰️', styles:['감성'], relations:['couple','closefriend','family','boss'], min:15000, max:30000, tags:['홈'], ageBoost:['20대','30대']},
+  {name:'기모 원마일웨어 실내복 세트', ic:'🧥', styles:['실용'], relations:['couple','family'], min:25000, max:50000, tags:['패션'], ageBoost:['40대','50대 이상']},
   {name:'미니 전기요', ic:'🔌', styles:['실용'], relations:['family'], min:30000, max:60000, tags:['홈'], ageBoost:['50대 이상']},
   {name:'반려식물 워터드롭 화분 세트', ic:'🪴', styles:['감성'], relations:['closefriend','longfriend','boss'], min:15000, max:30000, tags:['식물'], ageBoost:['20대','30대']},
-  {name:'아로마 디퓨저 오일 세트', ic:'🌿', styles:['감성'], relations:['closefriend','family','longfriend'], min:20000, max:40000, tags:['향'], ageBoost:['30대','40대']},
-  {name:'원목 트레이 + 머그컵 세트', ic:'☕', styles:['감성','무난'], relations:['family','closefriend'], min:20000, max:40000, tags:['홈'], ageBoost:['30대','40대']},
-  {name:'캠핑 감성 미니 랜턴', ic:'🏮', styles:['힙함'], relations:['closefriend','sum'], min:20000, max:40000, tags:['홈'], ageBoost:['20대','30대']},
+  {name:'아로마 디퓨저 오일 세트', ic:'🌿', styles:['감성'], relations:['couple','closefriend','family','longfriend'], min:20000, max:40000, tags:['향'], ageBoost:['30대','40대']},
+  {name:'원목 트레이 + 머그컵 세트', ic:'☕', styles:['감성','무난'], relations:['couple','family','closefriend'], min:20000, max:40000, tags:['홈'], ageBoost:['30대','40대']},
+  {name:'캠핑 감성 미니 랜턴', ic:'🏮', styles:['힙함'], relations:['closefriend','sum','couple'], min:20000, max:40000, tags:['홈'], ageBoost:['20대','30대']},
   {name:'블루투스 키보드 + 마우스 세트', ic:'⌨️', styles:['실용'], relations:['boss','family'], min:40000, max:70000, tags:['디지털'], ageBoost:['30대','40대']},
-  {name:'무선 이어폰 케이스 파우치', ic:'🎧', styles:['힙함'], relations:['closefriend','sum'], min:8000, max:15000, tags:['액세서리'], ageBoost:['10대','20대']},
-  {name:'캐시미어 니트', ic:'🧶', styles:['감성','실용'], relations:['family','sum'], min:60000, max:150000, tags:['패션'], ageBoost:['30대','40대','50대 이상']},
-  {name:'감성 캘리그라피 액자', ic:'🖼️', styles:['감성'], relations:['closefriend','longfriend','family'], min:15000, max:30000, tags:['홈'], ageBoost:['20대','30대','40대']},
-  {name:'원두커피 선물세트', ic:'☕', styles:['무난'], relations:['boss','closefriend','family'], min:15000, max:35000, tags:['식품주류'], ageBoost:['30대','40대']},
-  {name:'초콜릿 · 마카롱 선물세트', ic:'🍫', styles:['감성','무난'], relations:['sum','sogaeting','closefriend'], min:10000, max:25000, tags:['식품주류'], ageBoost:['10대','20대']},
-  {name:'반려동물 간식 선물세트', ic:'🐾', styles:['감성'], relations:['closefriend','family'], min:15000, max:30000, tags:[], ageBoost:['20대','30대']},
-  {name:'스니커즈 세탁 케어 키트', ic:'👟', styles:['실용','힙함'], relations:['closefriend','sum'], min:15000, max:25000, tags:['패션'], ageBoost:['10대','20대']},
-  {name:'캐릭터 콜라보 우산', ic:'☔', styles:['힙함','무난'], relations:['closefriend','family'], min:15000, max:25000, tags:['패션'], ageBoost:['10대','20대']},
-  {name:'감성 캔버스 에코백', ic:'👜', styles:['감성','힙함'], relations:['closefriend','sum','longfriend'], min:10000, max:20000, tags:['패션'], ageBoost:['10대','20대']},
+  {name:'무선 이어폰 케이스 파우치', ic:'🎧', styles:['힙함'], relations:['closefriend','sum','couple'], min:8000, max:15000, tags:['액세서리'], ageBoost:['10대','20대']},
+  {name:'캐시미어 니트', ic:'🧶', styles:['감성','실용'], relations:['family','sum','couple'], min:60000, max:150000, tags:['패션'], ageBoost:['30대','40대','50대 이상']},
+  {name:'감성 캘리그라피 액자', ic:'🖼️', styles:['감성'], relations:['couple','closefriend','longfriend','family'], min:15000, max:30000, tags:['홈'], ageBoost:['20대','30대','40대']},
+  {name:'원두커피 선물세트', ic:'☕', styles:['무난'], relations:['couple','boss','closefriend','family'], min:15000, max:35000, tags:['식품주류'], ageBoost:['30대','40대']},
+  {name:'초콜릿 · 마카롱 선물세트', ic:'🍫', styles:['감성','무난'], relations:['sum','couple','closefriend'], min:10000, max:25000, tags:['식품주류'], ageBoost:['10대','20대']},
+  {name:'반려동물 간식 선물세트', ic:'🐾', styles:['감성'], relations:['closefriend','family'], min:15000, max:30000, tags:['반려'], ageBoost:['20대','30대']},
+  {name:'스니커즈 세탁 케어 키트', ic:'👟', styles:['실용','힙함'], relations:['closefriend','sum','couple'], min:15000, max:25000, tags:['패션'], ageBoost:['10대','20대']},
+  {name:'캐릭터 콜라보 우산', ic:'☔', styles:['힙함','무난'], relations:['couple','closefriend','family'], min:15000, max:25000, tags:['패션'], ageBoost:['10대','20대']},
+  {name:'감성 캔버스 에코백', ic:'👜', styles:['감성','힙함'], relations:['closefriend','sum','couple','longfriend'], min:10000, max:20000, tags:['패션'], ageBoost:['10대','20대']},
   {name:'미니 블렌더', ic:'🥤', styles:['실용'], relations:['family','closefriend'], min:25000, max:45000, tags:['디지털'], ageBoost:['20대','30대','40대']},
-  {name:'프리미엄 아로마 입욕제 기프트박스', ic:'🛁', styles:['감성'], relations:['family','closefriend','longfriend'], min:25000, max:45000, tags:['뷰티'], ageBoost:['30대','40대','50대 이상']},
-  {name:'시그니처 룸스프레이 세트', ic:'🌫️', styles:['감성'], relations:['closefriend','longfriend','family'], min:20000, max:40000, tags:['향'], ageBoost:['20대','30대','40대']},
-  {name:'헤어드라이기', ic:'💨', styles:['실용'], relations:['family','sum'], min:40000, max:90000, tags:['디지털'], ageBoost:['20대','30대','40대']},
+  {name:'프리미엄 아로마 입욕제 기프트박스', ic:'🛁', styles:['감성'], relations:['couple','family','closefriend','longfriend'], min:25000, max:45000, tags:['뷰티'], ageBoost:['30대','40대','50대 이상']},
+  {name:'시그니처 룸스프레이 세트', ic:'🌫️', styles:['감성'], relations:['couple','closefriend','longfriend','family'], min:20000, max:40000, tags:['향'], ageBoost:['20대','30대','40대']},
+  {name:'헤어드라이기', ic:'💨', styles:['실용'], relations:['family','sum','couple'], min:40000, max:90000, tags:['디지털'], ageBoost:['20대','30대','40대']},
   {name:'브랜드 스텐 보온병', ic:'🧊', styles:['실용','무난'], relations:['family','boss','closefriend'], min:20000, max:40000, tags:['홈'], ageBoost:['30대','40대','50대 이상']},
 
   /* ---- 보완분 14종 (2026-08 데이터 점검: 가족+고가, 10대, 힙함 계열, 소개팅 카테고리 보강) ---- */
 
   // -- 가족 + 10만원 이상 (빨간색 삭제로 얇아진 고가 구간 보강) --
   {name:'프리미엄 안마의자 체험권(스파)', ic:'💆', styles:['실용','감성'], relations:['family','boss'], min:100000, max:200000, tags:['건강'], ageBoost:['40대','50대 이상']},
-  {name:'명품 브랜드 장지갑', ic:'👛', styles:['무난','감성'], relations:['family','boss'], min:120000, max:250000, tags:['액세서리'], ageBoost:['40대','50대 이상']},
-  {name:'프리미엄 호텔식 침구 세트', ic:'🛏️', styles:['실용','감성'], relations:['family'], min:100000, max:180000, tags:['홈'], ageBoost:['40대','50대 이상']},
-  {name:'명품 브랜드 손목시계', ic:'⌚', styles:['무난'], relations:['family','boss'], min:150000, max:300000, tags:['액세서리'], ageBoost:['40대','50대 이상']},
+  {name:'명품 브랜드 장지갑', ic:'👛', styles:['무난','감성'], relations:['couple','family'], min:120000, max:250000, tags:['액세서리'], ageBoost:['40대','50대 이상']},
+  {name:'프리미엄 호텔식 침구 세트', ic:'🛏️', styles:['실용','감성'], relations:['couple','family'], min:100000, max:180000, tags:['홈'], ageBoost:['40대','50대 이상']},
+  {name:'명품 브랜드 손목시계', ic:'⌚', styles:['무난'], relations:['couple','family'], min:150000, max:300000, tags:['액세서리'], ageBoost:['40대','50대 이상']},
 
   // -- 10대 보강 (삭제로 얇아진 학생 연령대) --
-  {name:'인기 아이돌 포토카드 굿즈 세트', ic:'📸', styles:['힙함'], relations:['closefriend','sum','sogaeting'], min:10000, max:20000, tags:[], ageBoost:['10대']},
-  {name:'캐릭터 담요 + 쿠션 세트', ic:'🧸', styles:['감성','실용'], relations:['family','closefriend'], min:20000, max:35000, tags:['홈'], ageBoost:['10대','20대']},
+  {name:'인기 아이돌 포토카드 굿즈 세트', ic:'📸', styles:['힙함'], relations:['closefriend','sum','couple'], min:10000, max:20000, tags:['취미'], ageBoost:['10대']},
+  {name:'캐릭터 담요 + 쿠션 세트', ic:'🧸', styles:['감성','실용'], relations:['couple','family','closefriend'], min:20000, max:35000, tags:['홈'], ageBoost:['10대','20대']},
   {name:'학생 다이어리 + 스티커 세트', ic:'📓', styles:['감성','실용'], relations:['closefriend','family'], min:8000, max:15000, tags:['문구'], ageBoost:['10대']},
-  {name:'보급형 무선 이어폰', ic:'🎧', styles:['실용','힙함'], relations:['closefriend','sum','family'], min:20000, max:40000, tags:['디지털'], ageBoost:['10대','20대']},
-  {name:'캐릭터 콜라보 슬리퍼', ic:'🩴', styles:['힙함','무난'], relations:['closefriend','family','sum'], min:10000, max:20000, tags:['패션'], ageBoost:['10대','20대']},
+  {name:'보급형 무선 이어폰', ic:'🎧', styles:['실용','힙함'], relations:['closefriend','sum','couple','family'], min:20000, max:40000, tags:['디지털'], ageBoost:['10대','20대']},
+  {name:'캐릭터 콜라보 슬리퍼', ic:'🩴', styles:['힙함','무난'], relations:['closefriend','family','sum','couple'], min:10000, max:20000, tags:['패션'], ageBoost:['10대','20대']},
 
   // -- 힙함 계열 보강 (오랜만친구·직장동료·가족에서 특히 얇았던 스타일) --
-  {name:'레트로 카세트 블루투스 스피커', ic:'📻', styles:['힙함'], relations:['closefriend','longfriend','boss','family'], min:30000, max:60000, tags:['디지털'], ageBoost:['20대','30대']},
-  {name:'이름 각인 커스텀 텀블러', ic:'🥤', styles:['힙함','감성'], relations:['closefriend','longfriend','boss','family','sum'], min:15000, max:30000, tags:['홈'], ageBoost:['20대','30대']},
-  {name:'미니 다트보드 게임 세트', ic:'🎯', styles:['힙함'], relations:['closefriend','longfriend','boss'], min:20000, max:35000, tags:[], ageBoost:['20대','30대']},
+  {name:'레트로 카세트 블루투스 스피커', ic:'📻', styles:['힙함'], relations:['closefriend','longfriend','family'], min:30000, max:60000, tags:['디지털'], ageBoost:['20대','30대']},
+  {name:'이름 각인 커스텀 텀블러', ic:'🥤', styles:['힙함','감성'], relations:['closefriend','longfriend','family','sum','couple'], min:15000, max:30000, tags:['홈'], ageBoost:['20대','30대']},
+  {name:'미니 다트보드 게임 세트', ic:'🎯', styles:['힙함'], relations:['closefriend','longfriend'], min:20000, max:35000, tags:['취미'], ageBoost:['20대','30대']},
 
   // -- 소개팅 카테고리 보강 (전체 관계 중 데이터가 가장 얇았던 소개팅, 특히 실용/무난) --
-  {name:'실용 여행 파우치 세트', ic:'🧳', styles:['실용'], relations:['sogaeting','closefriend'], min:15000, max:25000, tags:['패션'], ageBoost:['20대','30대']},
-  {name:'무난 텀블러 · 머그 선물세트', ic:'☕', styles:['무난'], relations:['sogaeting','closefriend','longfriend'], min:15000, max:25000, tags:['홈'], ageBoost:['20대','30대']},
+  {name:'실용 여행 파우치 세트', ic:'🧳', styles:['실용'], relations:['sum','couple','closefriend'], min:15000, max:25000, tags:['패션'], ageBoost:['20대','30대']},
+  {name:'무난 텀블러 · 머그 선물세트', ic:'☕', styles:['무난'], relations:['sum','couple','closefriend','longfriend'], min:15000, max:25000, tags:['홈'], ageBoost:['20대','30대']},
 
   /* ---- 보완분 2차 8종 (2026-08 데이터 점검: 오랜만친구+10만원이상 0개 등 고가 구간·힙함 보강) ---- */
 
   // -- 오랜만친구/소개팅 + 10만원 이상 (완전히 비어있던 구멍 메움) --
-  {name:'프리미엄 무선 헤드폰', ic:'🎧', styles:['힙함','실용'], relations:['longfriend','closefriend','sum'], min:120000, max:220000, tags:['디지털'], ageBoost:['20대','30대']},
-  {name:'가성비 명품 브랜드 백팩', ic:'🎒', styles:['무난','실용'], relations:['longfriend','sogaeting','closefriend'], min:100000, max:180000, tags:['패션'], ageBoost:['20대','30대']},
-  {name:'하이엔드 블루투스 스피커', ic:'🔊', styles:['힙함','감성'], relations:['sogaeting','closefriend','longfriend','boss'], min:100000, max:200000, tags:['디지털'], ageBoost:['20대','30대']},
+  {name:'프리미엄 무선 헤드폰', ic:'🎧', styles:['힙함','실용'], relations:['longfriend','closefriend','sum','couple'], min:120000, max:220000, tags:['디지털'], ageBoost:['20대','30대']},
+  {name:'가성비 명품 브랜드 백팩', ic:'🎒', styles:['무난','실용'], relations:['sum','couple','longfriend','closefriend'], min:100000, max:180000, tags:['패션'], ageBoost:['20대','30대']},
+  {name:'하이엔드 블루투스 스피커', ic:'🔊', styles:['힙함','감성'], relations:['sum','couple','closefriend','longfriend'], min:100000, max:200000, tags:['디지털'], ageBoost:['20대','30대']},
 
   // -- 오랜만친구/직장동료 + 힙함 보강 (동시에 고가 구간도 같이 채움) --
-  {name:'프리미엄 캠핑 체어 세트', ic:'🏕️', styles:['힙함','실용'], relations:['longfriend','closefriend','boss'], min:80000, max:150000, tags:[], ageBoost:['20대','30대','40대']},
-  {name:'레트로 미니 게임 콘솔', ic:'🕹️', styles:['힙함'], relations:['closefriend','longfriend','sum'], min:80000, max:150000, tags:['디지털'], ageBoost:['10대','20대','30대']},
+  {name:'프리미엄 캠핑 체어 세트', ic:'🏕️', styles:['힙함','실용'], relations:['longfriend','closefriend'], min:80000, max:150000, tags:['취미'], ageBoost:['20대','30대','40대']},
+  {name:'레트로 미니 게임 콘솔', ic:'🕹️', styles:['힙함'], relations:['closefriend','longfriend','sum','couple'], min:80000, max:150000, tags:['디지털'], ageBoost:['10대','20대','30대']},
 
   // -- 직장동료/가족 + 10만원 이상 (격식 있는 고가 선물 보강) --
-  {name:'명품 넥타이핀 · 커프스링크 세트', ic:'📎', styles:['무난'], relations:['boss','family'], min:100000, max:180000, tags:['액세서리'], ageBoost:['40대','50대 이상']},
-  {name:'골프용품 세트(소품)', ic:'⛳', styles:['실용','무난'], relations:['boss','family'], min:100000, max:200000, tags:[], ageBoost:['40대','50대 이상']},
+  {name:'명품 넥타이핀 · 커프스링크 세트', ic:'📎', styles:['무난'], relations:['couple','boss','family'], min:100000, max:180000, tags:['액세서리'], ageBoost:['40대','50대 이상']},
+  {name:'골프용품 세트(소품)', ic:'⛳', styles:['실용','무난'], relations:['boss','family'], min:100000, max:200000, tags:['취미'], ageBoost:['40대','50대 이상']},
 
   // -- 10대 + 10만원 이상 (거의 비어있던 구멍, 현실적인 고가 선물 하나 추가) --
   {name:'인기 게임기 액세서리 패키지', ic:'🎮', styles:['힙함','실용'], relations:['family','closefriend'], min:100000, max:180000, tags:['디지털'], ageBoost:['10대']},
+
+  /* ===== 보강 항목 (1만원 이하 / 나이 변별 / 고액 구간 / 뷰티·식품 비중) ===== */
+  /* ── A. 1만원 이하 구간 채우기 (20개) ───────────────────────────── */
+  {name:'편의점 금액권 5천원', ic:'🏪', styles:['무난','실용'], relations:['sum','closefriend','longfriend','boss','family'], ageBoost:['10대','20대','30대','40대','50대 이상'], min:5000, max:10000, tags:['상품권']},
+  {name:'카페 음료 교환권', ic:'☕', styles:['무난'], relations:['sum','closefriend','longfriend','boss','family'], ageBoost:['10대','20대','30대','40대','50대 이상'], min:4500, max:8000, tags:['상품권']},
+  {name:'생일 카드 + 미니 편지지', ic:'💌', styles:['감성'], relations:['sum','couple','closefriend','longfriend','boss','family'], ageBoost:['10대','20대','30대','40대','50대 이상'], min:3000, max:7000, tags:['기념']},
+  {name:'마스크팩 10매 세트', ic:'🧖', styles:['실용'], relations:['sum','couple','closefriend','longfriend','family'], ageBoost:['20대','30대','40대'], min:7000, max:12000, tags:['뷰티']},
+  {name:'미니 핸드크림 튜브', ic:'🧴', styles:['무난','실용'], relations:['sum','couple','closefriend','longfriend','boss','family'], ageBoost:['20대','30대','40대','50대 이상'], min:5000, max:9000, tags:['뷰티']},
+  {name:'립밤 · 틴트 미니 세트', ic:'💄', styles:['감성'], relations:['sum','couple','closefriend'], ageBoost:['10대','20대'], min:6000, max:10000, tags:['뷰티']},
+  {name:'수제 마카롱 4구', ic:'🧁', styles:['감성'], relations:['sum','couple','closefriend','boss'], ageBoost:['10대','20대','30대'], min:8000, max:12000, tags:['식품주류']},
+  {name:'드립백 커피 10입', ic:'☕', styles:['무난','실용'], relations:['couple','longfriend','boss','family'], ageBoost:['30대','40대','50대 이상'], min:8000, max:15000, tags:['식품주류']},
+  {name:'허브티 · 티백 세트', ic:'🍵', styles:['무난'], relations:['longfriend','boss','family'], ageBoost:['40대','50대 이상'], min:7000, max:12000, tags:['식품주류']},
+  {name:'젤리 · 초콜릿 미니 박스', ic:'🍬', styles:['힙함'], relations:['sum','couple','closefriend'], ageBoost:['10대','20대'], min:5000, max:9000, tags:['식품주류']},
+  {name:'캐릭터 볼펜 · 형광펜 세트', ic:'🖍️', styles:['힙함'], relations:['sum','closefriend'], ageBoost:['10대'], min:5000, max:10000, tags:['문구']},
+  {name:'스티커 · 마스킹테이프 세트', ic:'🎨', styles:['힙함','감성'], relations:['closefriend'], ageBoost:['10대'], min:4000, max:8000, tags:['문구']},
+  {name:'데스크 메모패드 · 인덱스', ic:'📝', styles:['실용'], relations:['longfriend','boss'], ageBoost:['30대','40대','50대 이상'], min:6000, max:10000, tags:['문구']},
+  {name:'미니 손소독제 · 핸드워시', ic:'🧼', styles:['실용'], relations:['couple','longfriend','boss','family'], ageBoost:['20대','30대','40대','50대 이상'], min:5000, max:9000, tags:['건강']},
+  {name:'접이식 에코백', ic:'👜', styles:['실용'], relations:['couple','closefriend','longfriend','family'], ageBoost:['20대','30대','40대'], min:7000, max:12000, tags:['패션']},
+  {name:'수면양말 · 덧신 세트', ic:'🧦', styles:['무난'], relations:['couple','closefriend','family'], ageBoost:['10대','20대','30대','40대','50대 이상'], min:6000, max:10000, tags:['패션']},
+  {name:'서랍용 향기 사쉐', ic:'🌸', styles:['감성'], relations:['sum','couple','closefriend','family'], ageBoost:['20대','30대'], min:6000, max:10000, tags:['향']},
+  {name:'책상용 미니 다육 화분', ic:'🪴', styles:['무난','감성'], relations:['longfriend','boss','family'], ageBoost:['30대','40대','50대 이상'], min:8000, max:13000, tags:['식물']},
+  {name:'폰 스트랩 · 참 장식', ic:'📿', styles:['힙함'], relations:['sum','couple','closefriend'], ageBoost:['10대','20대'], min:7000, max:12000, tags:['액세서리']},
+  {name:'미니 게임 카드 · 보드게임', ic:'🃏', styles:['힙함'], relations:['closefriend','family'], ageBoost:['10대','20대'], min:8000, max:15000, tags:['취미']},
+  /* ── B. 나이 변별력 확보 (10개) ─────────────────────────────────── */
+  {name:'아이돌 응원봉 · 굿즈 키링', ic:'🪄', styles:['힙함'], relations:['closefriend'], ageBoost:['10대'], min:12000, max:30000, tags:['취미']},
+  {name:'학용품 · 샤프 문구 세트', ic:'✏️', styles:['실용'], relations:['closefriend','family'], ageBoost:['10대'], min:8000, max:15000, tags:['문구']},
+  {name:'지압 슬리퍼 · 발마사지기', ic:'🦶', styles:['실용'], relations:['boss','family'], ageBoost:['50대 이상'], min:20000, max:40000, tags:['건강']},
+  {name:'무릎담요 + 찜질팩', ic:'🧣', styles:['무난'], relations:['boss','family'], ageBoost:['40대','50대 이상'], min:15000, max:30000, tags:['건강']},
+  {name:'발효홍삼 스틱 30포', ic:'🫚', styles:['무난'], relations:['boss','family'], ageBoost:['50대 이상'], min:40000, max:80000, tags:['건강']},
+  {name:'전통 차 선물세트', ic:'🍵', styles:['무난'], relations:['boss','family'], ageBoost:['50대 이상'], min:30000, max:60000, tags:['식품주류']},
+  {name:'골프공 · 골프 소모품 세트', ic:'⛳', styles:['실용'], relations:['boss','family'], ageBoost:['40대','50대 이상'], min:20000, max:40000, tags:['취미']},
+  {name:'차량용 디퓨저 · 방향제', ic:'🚗', styles:['무난'], relations:['couple','longfriend','boss','family'], ageBoost:['30대','40대','50대 이상'], min:15000, max:30000, tags:['향']},
+  {name:'원목 도마 · 주방 소품 세트', ic:'🪵', styles:['실용'], relations:['longfriend','family'], ageBoost:['30대','40대'], min:25000, max:50000, tags:['홈']},
+  {name:'프리미엄 수건 세트', ic:'🛁', styles:['무난'], relations:['longfriend','boss','family'], ageBoost:['30대','40대','50대 이상'], min:20000, max:40000, tags:['홈']},
+  /* ── C. 소개팅 · 오랜만 친구 고액 구간 (6개) ──────────────────────── */
+  {name:'백화점 상품권 5만원', ic:'🎟️', styles:['무난'], relations:['sum','longfriend','boss','family'], ageBoost:['20대','30대','40대','50대 이상'], min:50000, max:100000, tags:['상품권']},
+  {name:'호텔 디저트 · 애프터눈티 이용권', ic:'🍰', styles:['감성'], relations:['sum','couple','closefriend'], ageBoost:['20대','30대'], min:60000, max:120000, tags:['식품주류']},
+  {name:'프리미엄 디퓨저 세트', ic:'🕯️', styles:['감성'], relations:['sum','couple','longfriend','boss'], ageBoost:['20대','30대','40대'], min:50000, max:90000, tags:['향']},
+  {name:'브랜드 머플러 · 스카프', ic:'🧣', styles:['무난','감성'], relations:['sum','couple','longfriend','family'], ageBoost:['20대','30대','40대'], min:60000, max:120000, tags:['패션']},
+  {name:'스파 · 마사지 이용권', ic:'💆', styles:['실용'], relations:['couple','longfriend','boss','family'], ageBoost:['30대','40대','50대 이상'], min:70000, max:150000, tags:['건강']},
+  {name:'프리미엄 과일 선물세트', ic:'🍎', styles:['무난'], relations:['sum','couple','longfriend','boss','family'], ageBoost:['40대','50대 이상'], min:50000, max:90000, tags:['식품주류']},
+  /* ── D. 뷰티 · 식품 비중 보강 (5개) ─────────────────────────────── */
+  {name:'향수 디스커버리 세트', ic:'🌺', styles:['감성'], relations:['sum','couple','closefriend'], ageBoost:['20대','30대'], min:30000, max:60000, tags:['향']},
+  {name:'클렌징 · 토너 기초 세트', ic:'🧴', styles:['실용'], relations:['couple','closefriend','longfriend','family'], ageBoost:['20대','30대','40대'], min:25000, max:50000, tags:['뷰티']},
+  {name:'그루밍 · 쉐이빙 세트', ic:'🪒', styles:['실용'], relations:['couple','longfriend','boss','family'], ageBoost:['30대','40대','50대 이상'], min:30000, max:60000, tags:['뷰티']},
+  {name:'수제 잼 · 꿀 선물세트', ic:'🍯', styles:['무난'], relations:['longfriend','boss','family'], ageBoost:['40대','50대 이상'], min:20000, max:40000, tags:['식품주류']},
+  {name:'프리미엄 초콜릿 박스', ic:'🍫', styles:['감성'], relations:['sum','couple','boss'], ageBoost:['20대','30대','40대'], min:25000, max:50000, tags:['식품주류']},
 ];
